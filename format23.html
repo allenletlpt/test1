@@ -1,0 +1,284 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPC 兩兩比較評估 (固定 vs 連續)</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        :root {
+            --primary-blue: #0056b3;
+            --light-bg: #f8f9fa;
+            --border-color: #dee2e6;
+        }
+
+        body {
+            font-family: "Microsoft JhengHei", sans-serif;
+            background-color: #f0f2f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* 題目卡片外框 */
+        .question-card {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+            border-left: 5px solid var(--primary-blue);
+            padding-left: 10px;
+        }
+
+        /* 左右選項佈局 */
+        .comparison-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .side-text {
+            width: 20%;
+            font-weight: bold;
+            color: #495057;
+        }
+
+            .side-text.left {
+                text-align: left;
+            }
+
+            .side-text.right {
+                text-align: right;
+            }
+
+        .slider-area {
+            width: 55%;
+            position: relative;
+            text-align: center;
+        }
+
+        /* 通用滑動條樣式 */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 10px;
+            border-radius: 5px;
+            background: #e9ecef;
+            outline: none;
+            margin: 10px 0;
+            cursor: pointer;
+        }
+
+            /* 滑塊 (Thumb) 樣式 */
+            input[type=range]::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                appearance: none;
+                width: 24px;
+                height: 24px;
+                border-radius: 50%;
+                background: var(--primary-blue);
+                cursor: pointer;
+                border: 2px solid white;
+                box-shadow: 0 0 4px rgba(0,0,0,0.3);
+                transition: background .15s ease-in-out;
+            }
+
+            input[type=range]::-moz-range-thumb {
+                width: 24px;
+                height: 24px;
+                border-radius: 50%;
+                background: var(--primary-blue);
+                cursor: pointer;
+                border: 2px solid white;
+                box-shadow: 0 0 4px rgba(0,0,0,0.3);
+            }
+
+        /* --- 第一題專用樣式 (固定節點) --- */
+        .fixed-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #888;
+            margin-top: -5px;
+            padding: 0 2px; /* 修正對齊 */
+        }
+
+        .tick-mark {
+            position: relative;
+            text-align: center;
+            width: 20px;
+        }
+        /* 在軌道上畫出5個點的視覺輔助 */
+        .track-dots {
+            display: flex;
+            justify-content: space-between;
+            position: absolute;
+            top: 13px; /* 調整至軌道中間 */
+            left: 2px;
+            right: 2px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .dot {
+            width: 4px;
+            height: 4px;
+            background: #adb5bd;
+            border-radius: 50%;
+        }
+
+        /* --- 第二題專用樣式 (連續) --- */
+        .continuous-bg {
+            background: linear-gradient(to right, rgba(0,86,179,0.1), #e9ecef 50%, rgba(0,86,179,0.1));
+        }
+
+        /* 顯示數值的標籤 */
+        .value-display {
+            font-size: 14px;
+            color: var(--primary-blue);
+            font-weight: bold;
+            margin-top: 10px;
+            display: inline-block;
+            background: #e7f1ff;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <div class="question-card">
+            <div class="card-title">第一題：固定 5 點量尺 (只能選特定層級)</div>
+
+            <div class="comparison-row">
+                <div class="side-text left">
+                    勤奮工作<br>
+                    <small style="color:#888; font-weight:normal;">(項目 A)</small>
+                </div>
+
+                <div class="slider-area">
+                    <div class="track-dots">
+                        <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+                    </div>
+
+                    <input type="range" id="q1_slider" min="-2" max="2" step="1" value="0">
+
+                    <div class="fixed-labels">
+                        <div class="tick-mark">A++</div>
+                        <div class="tick-mark">A+</div>
+                        <div class="tick-mark">同</div>
+                        <div class="tick-mark">B+</div>
+                        <div class="tick-mark">B++</div>
+                    </div>
+
+                    <div class="value-display">目前選擇：<span id="q1_text">同等重要</span></div>
+                </div>
+
+                <div class="side-text right">
+                    重視意見<br>
+                    <small style="color:#888; font-weight:normal;">(項目 B)</small>
+                </div>
+            </div>
+            <input type="hidden" id="hf_Q1_Value" name="hf_Q1_Value" value="0">
+        </div>
+
+
+        <div class="question-card">
+            <div class="card-title">第二題：連續無段量尺 (可停在任意位置)</div>
+
+            <div class="comparison-row">
+                <div class="side-text left">
+                    技術能力<br>
+                    <small style="color:#888; font-weight:normal;">(項目 A)</small>
+                </div>
+
+                <div class="slider-area">
+                    <input type="range" id="q2_slider" class="continuous-bg" min="-100" max="100" step="0.1" value="0">
+
+                    <div style="display:flex; justify-content:space-between; color:#ccc; font-size:12px; margin-top:5px;">
+                        <span>偏向 A</span>
+                        <span>|</span>
+                        <span>偏向 B</span>
+                    </div>
+
+                    <div class="value-display">傾向程度：<span id="q2_text">0 (置中)</span></div>
+                </div>
+
+                <div class="side-text right">
+                    溝通能力<br>
+                    <small style="color:#888; font-weight:normal;">(項目 B)</small>
+                </div>
+            </div>
+            <input type="hidden" id="hf_Q2_Value" name="hf_Q2_Value" value="0">
+        </div>
+
+    </div>
+
+    <script>
+        $(document).ready(function () {
+
+            // ----------------------------------------
+            // 第一題邏輯：5 個固定點映射文字
+            // ----------------------------------------
+            var q1_mapping = {
+                "-2": "極為偏向 A",
+                "-1": "稍微偏向 A",
+                "0": "同等重要",
+                "1": "稍微偏向 B",
+                "2": "極為偏向 B"
+            };
+
+            $('#q1_slider').on('input change', function () {
+                var val = $(this).val();
+
+                // 更新畫面文字
+                $('#q1_text').text(q1_mapping[val]);
+
+                // 更新隱藏欄位 (給 Web Forms 後端用)
+                $('#hf_Q1_Value').val(val);
+            });
+
+
+            // ----------------------------------------
+            // 第二題邏輯：連續數值計算
+            // ----------------------------------------
+            $('#q2_slider').on('input change', function () {
+                var val = parseFloat($(this).val());
+                var text = "";
+
+                if (val === 0) {
+                    text = "0 (完全置中)";
+                } else if (val < 0) {
+                    // 轉正數顯示
+                    text = "偏向 A (" + Math.abs(val).toFixed(1) + ")";
+                } else {
+                    text = "偏向 B (" + val.toFixed(1) + ")";
+                }
+
+                // 更新畫面文字
+                $('#q2_text').text(text);
+
+                // 更新隱藏欄位 (給 Web Forms 後端用)
+                $('#hf_Q2_Value').val(val);
+            });
+
+        });
+    </script>
+
+</body>
+</html>
