@@ -1,0 +1,422 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPC 綜合評估問卷 (優化Q3背景)</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #0056b3;
+            --secondary: #28a745;
+            --bg-page: #f4f6f9;
+            --bg-card: #ffffff;
+            --text-main: #333333;
+            --text-sub: #6c757d;
+            --border-color: #dee2e6;
+            --track-bg-default: #e9ecef; /* 原本的軌道顏色 */
+            --track-bg-strong: #dde2e6; /* 加強版的軌道顏色 */
+        }
+
+        body {
+            font-family: "Microsoft JhengHei", "Segoe UI", sans-serif;
+            background-color: var(--bg-page);
+            padding: 20px;
+            color: var(--text-main);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary);
+            margin-bottom: 30px;
+        }
+
+        /* 卡片樣式 */
+        .question-card {
+            background: var(--bg-card);
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        .q-header {
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .q-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .q-desc {
+            font-size: 14px;
+            color: var(--text-sub);
+            margin-top: 5px;
+        }
+
+        /* --- 第1題樣式 (選擇題) --- */
+        .selection-grid {
+            display: flex;
+            gap: 20px;
+        }
+
+        .select-box {
+            flex: 1;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+            background: #fafafa;
+        }
+
+            .select-box:hover {
+                background: #f0f8ff;
+                border-color: #aecce8;
+            }
+
+            .select-box.active {
+                border-color: var(--primary);
+                background: #e7f1ff;
+                color: var(--primary);
+                box-shadow: 0 0 0 3px rgba(0, 86, 179, 0.1);
+                position: relative;
+            }
+
+                .select-box.active::after {
+                    content: '✔';
+                    font-size: 24px;
+                    position: absolute;
+                    top: 10px;
+                    right: 10px;
+                }
+
+        .sel-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .sel-desc {
+            font-size: 13px;
+            color: var(--text-sub);
+        }
+
+        /* --- 滑桿共用結構 (第2 & 3題) --- */
+        .comparison-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .side-label {
+            width: 20%;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+            .side-label.text-right {
+                text-align: right;
+            }
+
+        .slider-wrapper {
+            width: 55%;
+            padding: 0 10px;
+            position: relative;
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+            cursor: pointer;
+        }
+
+            input[type=range]:focus {
+                outline: none;
+            }
+
+        /* 基本滑動條軌道樣式 */
+        .std-slider {
+            height: 10px;
+            border-radius: 5px;
+            background: var(--track-bg-default); /* 使用變數 */
+            margin: 10px 0;
+            transition: all 0.3s;
+        }
+
+        /* ==========================================================================
+           【特別修改】針對第3題 (連續量尺 #range_Q3) 的背景加強
+           ========================================================================== */
+        #range_Q3.std-slider {
+            background: var(--track-bg-strong); /* 顏色加深 */
+            height: 14px; /* 稍微加高，讓它看起來更顯眼 */
+            border-radius: 7px;
+            /* 加入內陰影，製造凹槽感，增加立體視覺 */
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.15);
+            border: 1px solid #ced4da; /* 增加細邊框 */
+        }
+            /* 因為軌道變高了，需要微調滑塊(thumb)的垂直位置 */
+            #range_Q3.std-slider::-webkit-slider-thumb {
+                margin-top: -6px !important; /* (26px thumb高度 - 14px 軌道高度) / -2 = -6px */
+            }
+        /* ========================================================================== */
+
+        /* 滑塊 (圓點) 樣式 */
+        .std-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 26px;
+            width: 26px;
+            border-radius: 50%;
+            background: var(--primary);
+            border: 3px solid #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            margin-top: -8px; /* 預設垂直置中修正 (適用於10px高的軌道) */
+        }
+
+        /* 第2題專用：刻度 */
+        .fixed-ticks {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #aaa;
+            margin-top: 5px;
+            padding: 0 5px;
+        }
+
+        .tick {
+            position: relative;
+            text-align: center;
+            width: 10px;
+        }
+
+            .tick::before {
+                content: '';
+                position: absolute;
+                top: -18px;
+                left: 50%;
+                width: 2px;
+                height: 6px;
+                background: #ccc;
+            }
+
+        /* --- 第4題樣式 (雙滑塊) --- */
+        .dual-track-container {
+            position: relative;
+            height: 50px;
+            margin-top: 20px;
+        }
+        /* 這裡也同步加強一下第4題的視覺軌道背景，讓風格統一 */
+        .vis-track {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 12px;
+            background: var(--track-bg-strong);
+            border-radius: 6px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.15);
+            border: 1px solid #ced4da;
+            transform: translateY(-50%);
+            z-index: 0;
+        }
+
+        .overlay-range {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            margin: 0;
+            z-index: 2;
+        }
+
+            .overlay-range::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                pointer-events: auto;
+                width: 28px;
+                height: 28px;
+                border-radius: 50%;
+                border: 2px solid #fff;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+                margin-top: 11px;
+                position: relative;
+            }
+
+        #range_Q4_A::-webkit-slider-thumb {
+            background: var(--primary);
+        }
+
+        #range_Q4_B::-webkit-slider-thumb {
+            background: var(--secondary);
+        }
+
+        .value-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background: #eee;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .val-text-primary {
+            color: var(--primary);
+            background: #e7f1ff;
+        }
+
+        .val-text-secondary {
+            color: var(--secondary);
+            background: #e6f9ea;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>員工績效評估 (GPC)</h1>
+
+        <div class="question-card" id="q1_card">
+            <div class="q-header">
+                <div class="q-title">1. 決策風格偏好</div>
+                <div class="q-desc">請點擊選擇您較傾向的方案</div>
+            </div>
+            <div class="selection-grid">
+                <div class="select-box" id="btn_Q1_A" onclick="setQ1('A')">
+                    <div class="sel-title">方案 A</div>
+                    <div class="sel-desc">風險趨避，穩健成長</div>
+                </div>
+                <div class="select-box" id="btn_Q1_B" onclick="setQ1('B')">
+                    <div class="sel-title">方案 B</div>
+                    <div class="sel-desc">勇於冒險，追求高利</div>
+                </div>
+            </div>
+            <div style="text-align:center; margin-top:15px; font-size:14px; color:#666;">
+                目前選擇：<span id="text_Q1" style="font-weight:bold;">未選擇</span>
+            </div>
+            <input type="hidden" id="hf_Q1" name="hf_Q1" value="">
+        </div>
+
+        <div class="question-card" id="q2_card">
+            <div class="q-header">
+                <div class="q-title">2. 工作態度評估</div>
+                <div class="q-desc">請在 5 個固定層級中選擇一個最符合的描述</div>
+            </div>
+            <div class="comparison-row">
+                <div class="side-label">勤奮完成任務<br><small>(項目 A)</small></div>
+                <div class="slider-wrapper">
+                    <input type="range" id="range_Q2" class="std-slider" min="-2" max="2" step="1" value="0">
+                    <div class="fixed-ticks">
+                        <div class="tick"></div><div class="tick"></div><div class="tick"></div><div class="tick"></div><div class="tick"></div>
+                    </div>
+                    <div style="text-align:center; margin-top:15px;">
+                        <span id="text_Q2" class="value-badge">同等重要</span>
+                    </div>
+                </div>
+                <div class="side-label text-right">重視團隊意見<br><small>(項目 B)</small></div>
+            </div>
+            <input type="hidden" id="hf_Q2" name="hf_Q2" value="0">
+        </div>
+
+        <div class="question-card" id="q3_card">
+            <div class="q-header">
+                <div class="q-title">3. 技能傾向評估</div>
+                <div class="q-desc">請拖動滑桿至任意位置，表示您的傾向程度</div>
+            </div>
+            <div class="comparison-row">
+                <div class="side-label">技術深度<br><small>(項目 A)</small></div>
+                <div class="slider-wrapper">
+                    <input type="range" id="range_Q3" class="std-slider" min="-100" max="100" step="0.1" value="0">
+                    <div style="display:flex; justify-content:space-between; font-size:12px; color:#999; margin-top: 5px;">
+                        <span>◀ 偏向 A</span><span>偏向 B ▶</span>
+                    </div>
+                    <div style="text-align:center; margin-top:10px;">
+                        <span id="text_Q3" class="value-badge">0 (置中)</span>
+                    </div>
+                </div>
+                <div class="side-label text-right">溝通廣度<br><small>(項目 B)</small></div>
+            </div>
+            <input type="hidden" id="hf_Q3" name="hf_Q3" value="0">
+        </div>
+
+        <div class="question-card" id="q4_card">
+            <div class="q-header">
+                <div class="q-title">4. 專案比重分配</div>
+                <div class="q-desc">請在一條量尺上同時標示兩個項目的權重 (0-100)</div>
+            </div>
+            <div class="dual-track-container">
+                <div class="vis-track"></div>
+                <input type="range" id="range_Q4_A" class="overlay-range" min="0" max="100" value="30">
+                <input type="range" id="range_Q4_B" class="overlay-range" min="0" max="100" value="70">
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-top:20px;">
+                <div style="color:var(--primary);">
+                    <strong>● 項目 A (藍)</strong>: <span id="text_Q4_A" class="value-badge val-text-primary">30</span>
+                </div>
+                <div style="color:var(--secondary);">
+                    <strong>● 項目 B (綠)</strong>: <span id="text_Q4_B" class="value-badge val-text-secondary">70</span>
+                </div>
+            </div>
+            <input type="hidden" id="hf_Q4_A" name="hf_Q4_A" value="30">
+            <input type="hidden" id="hf_Q4_B" name="hf_Q4_B" value="70">
+        </div>
+
+    </div>
+
+    <script>
+        // (JavaScript 部分與上一版相同，無須變動)
+        const discrete_map = { "-2": "極為偏向 A", "-1": "稍微偏向 A", "0": "同等重要", "1": "稍微偏向 B", "2": "極為偏向 B" };
+
+        $(document).ready(function () {
+            // Q2
+            $('#range_Q2').on('input change', function () {
+                let val = $(this).val();
+                $('#text_Q2').text(discrete_map[val]);
+                $('#hf_Q2').val(val);
+            });
+
+            // Q3
+            $('#range_Q3').on('input change', function () {
+                let val = parseFloat($(this).val());
+                let display = val === 0 ? "0 (置中)" : (val < 0 ? "偏向 A (" + Math.abs(val).toFixed(1) + ")" : "偏向 B (" + val.toFixed(1) + ")");
+                $('#text_Q3').text(display);
+                $('#hf_Q3').val(val);
+            });
+
+            // Q4
+            function updateQ4(sourceId, targetTextId, targetHfId) {
+                let val = $(sourceId).val();
+                $(targetTextId).text(val);
+                $(targetHfId).val(val);
+                $('.overlay-range').css('z-index', 2);
+                $(sourceId).css('z-index', 10);
+            }
+            $('#range_Q4_A').on('input', function () { updateQ4('#range_Q4_A', '#text_Q4_A', '#hf_Q4_A'); });
+            $('#range_Q4_B').on('input', function () { updateQ4('#range_Q4_B', '#text_Q4_B', '#hf_Q4_B'); });
+        });
+
+        function setQ1(option) {
+            $('.select-box').removeClass('active');
+            $('#btn_Q1_' + option).addClass('active');
+            $('#text_Q1').text("方案 " + option);
+            $('#hf_Q1').val(option);
+        }
+    </script>
+
+</body>
+</html>
