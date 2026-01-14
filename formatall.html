@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
@@ -289,12 +289,12 @@
 <body>
 
     <div class="container">
-        <h1>員工績效評估 (GPC)</h1>
+        <h1> (GPC)</h1>
 
         <div class="question-card" id="q1_card">
             <div class="q-header">
-                <div class="q-title">1. 決策風格偏好</div>
-                <div class="q-desc">請點擊選擇您較傾向的方案</div>
+                <div class="q-title">1.請依照您對下列敘述的整體感受與偏好，選擇一個最符合您情況的選項</div>
+                <div class="q-desc"></div>
             </div>
             <div class="selection-grid">
                 <div class="select-box" id="btn_Q1_A" onclick="setQ1('A')">
@@ -314,8 +314,8 @@
 
         <div class="question-card" id="q2_card">
             <div class="q-header">
-                <div class="q-title">2. 工作態度評估</div>
-                <div class="q-desc">請在 5 個固定層級中選擇一個最符合的描述</div>
+                <div class="q-title">2. 請在 5 個固定層級中選擇一個最符合的描述</div>
+                <div class="q-desc"></div>
             </div>
             <div class="comparison-row">
                 <div class="side-label">勤奮完成任務<br><small>(項目 A)</small></div>
@@ -380,7 +380,7 @@
 
     <script>
         // (JavaScript 部分與上一版相同，無須變動)
-        const discrete_map = { "-2": "極為偏向 A", "-1": "稍微偏向 A", "0": "同等重要", "1": "稍微偏向 B", "2": "極為偏向 B" };
+        const discrete_map = { "-2": "非常像 A", "-1": "有點像 A", "0": "同等重要", "1": "有點像 B", "2": "非常像 B" };
 
         $(document).ready(function () {
             // Q2
@@ -419,5 +419,4 @@
     </script>
 
 </body>
-
 </html>
