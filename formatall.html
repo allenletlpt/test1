@@ -543,7 +543,7 @@
                     $item.css('left', finalLeftPct + '%');
 
                     // 4. 更新數值
-                    const finalVal = Math.round(percent);
+                    const finalVal = Math.round(percent*10);
                     $('#text_Q4_' + itemId).text(finalVal);
                     $('#hf_Q4_' + itemId).val(finalVal);
                 }
