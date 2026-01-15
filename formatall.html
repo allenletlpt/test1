@@ -486,9 +486,11 @@
                     return Number.isInteger(normalized) ? normalized.toFixed(0) : normalized.toFixed(1);
                 };
                 let aPercent = 50 - val / 2;
+                aPercent = formatPct(aPercent);
                 let bPercent = 100 - aPercent;
+                bPercent = formatPct(bPercent)
                 $('#text_Q3').text(
-                    `喜歡A(${formatPct(aPercent)}%)、喜歡B(${formatPct(bPercent)}%)`
+                    `喜歡A(${aPercent}%)、喜歡B(${bPercent}%)`
                 );
                 $('#hf_Q3').val(val);
             });
@@ -599,5 +601,3 @@
 
 </body>
 </html>
-
-
