@@ -6,6 +6,12 @@
     <title>GPC 綜合評估問卷</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+
+    <!-- jQuery UI & Touch Punch (for Drag & Drop) -->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/smoothness/jquery-ui.css">
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
+
     <style>
         :root {
             --primary: #0056b3;
@@ -65,7 +71,7 @@
             margin-top: 5px;
         }
 
-        /* --- 第1題樣式 (選擇題) --- */
+        /* Q1 */
         .selection-grid {
             display: flex;
             gap: 20px;
@@ -114,7 +120,7 @@
             color: var(--text-sub);
         }
 
-        /* --- 滑桿共用結構 (第2 & 3題) --- */
+        /* Sliders */
         .comparison-row {
             display: flex;
             justify-content: space-between;
@@ -150,33 +156,26 @@
                 outline: none;
             }
 
-        /* 基本滑動條軌道樣式 */
         .std-slider {
             height: 10px;
             border-radius: 5px;
-            background: var(--track-bg-default); /* 使用變數 */
+            background: var(--track-bg-default);
             margin: 10px 0;
             transition: all 0.3s;
         }
 
-        /* ==========================================================================
-           【特別修改】針對第3題 (連續量尺 #range_Q3) 的背景加強
-           ========================================================================== */
         #range_Q3.std-slider {
-            background: var(--track-bg-strong); /* 顏色加深 */
-            height: 14px; /* 稍微加高，讓它看起來更顯眼 */
+            background: var(--track-bg-strong);
+            height: 14px;
             border-radius: 7px;
-            /* 加入內陰影，製造凹槽感，增加立體視覺 */
             box-shadow: inset 0 2px 5px rgba(0,0,0,0.15);
-            border: 1px solid #ced4da; /* 增加細邊框 */
+            border: 1px solid #ced4da;
         }
-            /* 因為軌道變高了，需要微調滑塊(thumb)的垂直位置 */
-            #range_Q3.std-slider::-webkit-slider-thumb {
-                margin-top: -6px !important; /* (26px thumb高度 - 14px 軌道高度) / -2 = -6px */
-            }
-        /* ========================================================================== */
 
-        /* 滑塊 (圓點) 樣式 */
+            #range_Q3.std-slider::-webkit-slider-thumb {
+                margin-top: -6px !important;
+            }
+
         .std-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
             height: 26px;
@@ -185,10 +184,9 @@
             background: var(--primary);
             border: 3px solid #fff;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            margin-top: -8px; /* 預設垂直置中修正 (適用於10px高的軌道) */
+            margin-top: -8px;
         }
 
-        /* 第2題專用：刻度 */
         .fixed-ticks {
             display: flex;
             justify-content: space-between;
@@ -214,58 +212,6 @@
                 background: #ccc;
             }
 
-        /* --- 第4題樣式 (雙滑塊) --- */
-        .dual-track-container {
-            position: relative;
-            height: 50px;
-            margin-top: 20px;
-        }
-        /* 這裡也同步加強一下第4題的視覺軌道背景，讓風格統一 */
-        .vis-track {
-            position: absolute;
-            top: 50%;
-            left: 0;
-            right: 0;
-            height: 12px;
-            background: var(--track-bg-strong);
-            border-radius: 6px;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.15);
-            border: 1px solid #ced4da;
-            transform: translateY(-50%);
-            z-index: 0;
-        }
-
-        .overlay-range {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            margin: 0;
-            z-index: 2;
-        }
-
-            .overlay-range::-webkit-slider-thumb {
-                -webkit-appearance: none;
-                pointer-events: auto;
-                width: 28px;
-                height: 28px;
-                border-radius: 50%;
-                border: 2px solid #fff;
-                box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-                margin-top: 11px;
-                position: relative;
-            }
-
-        #range_Q4_A::-webkit-slider-thumb {
-            background: var(--primary);
-        }
-
-        #range_Q4_B::-webkit-slider-thumb {
-            background: var(--secondary);
-        }
-
         .value-badge {
             display: inline-block;
             padding: 4px 8px;
@@ -284,26 +230,126 @@
             color: var(--secondary);
             background: #e6f9ea;
         }
+
+        /* --- 第4題樣式 (Drag & Drop) --- */
+        .q4-track-container {
+            position: relative;
+            height: 120px;
+            background: #fafbfc;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        .q4-vis-track {
+            position: absolute;
+            top: 40%;
+            left: 35px; /* 留出圓球半徑空間 */
+            right: 35px;
+            height: 12px;
+            background: var(--track-bg-strong);
+            border-radius: 6px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.15);
+            border: 1px solid #ced4da;
+            transform: translateY(-50%);
+            z-index: 0;
+        }
+
+        .q4-track-labels {
+            position: absolute;
+            bottom: 15px;
+            left: 35px;
+            right: 35px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #888;
+            pointer-events: none;
+        }
+
+        .q4-item-pool {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            padding: 20px;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            background: #fff;
+            min-height: 80px;
+            align-items: center;
+        }
+
+        .q4-wrapper-item {
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+            border-radius: 50%;
+            border: 1px solid #eee;
+        }
+
+        .q4-drag-item {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            cursor: grab;
+            font-weight: bold;
+            color: #fff;
+            font-size: 13px;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+            z-index: 100;
+            text-align: center;
+            line-height: 1.2;
+            touch-action: none; /* 防止觸控時捲動頁面 */
+        }
+
+            .q4-drag-item:active {
+                cursor: grabbing;
+            }
+
+        .item-a {
+            background: var(--primary);
+            border: 2px solid #fff;
+        }
+
+        .item-b {
+            background: var(--secondary);
+            border: 2px solid #fff;
+        }
+
+        /* 拖曳時的狀態 */
+        .q4-drag-item.ui-draggable-dragging {
+            opacity: 0.9;
+            transform: scale(1.1);
+            z-index: 1000;
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1> (GPC)</h1>
-
+        <h1> GPC 綜合評估問卷</h1>
+        <!-- Q1 -->
         <div class="question-card" id="q1_card">
             <div class="q-header">
-                <div class="q-title">1.請依照您對下列敘述的整體感受與偏好，選擇一個最符合您情況的選項</div>
-                <div class="q-desc"></div>
+                <div class="q-title">1.技能傾向評估</div>
+                <div class="q-desc">請依照您對下列敘述的整體感受與偏好，選擇一個最符合您情況的選項</div>
             </div>
             <div class="selection-grid">
                 <div class="select-box" id="btn_Q1_A" onclick="setQ1('A')">
-                    <div class="sel-title">方案 A</div>
-                    <div class="sel-desc">風險趨避，穩健成長</div>
+                    <div class="sel-title">技術深度</div>
+                    <div class="sel-desc">項目 A</div>
                 </div>
                 <div class="select-box" id="btn_Q1_B" onclick="setQ1('B')">
-                    <div class="sel-title">方案 B</div>
-                    <div class="sel-desc">勇於冒險，追求高利</div>
+                    <div class="sel-title">溝通廣度</div>
+                    <div class="sel-desc">項目 B</div>
                 </div>
             </div>
             <div style="text-align:center; margin-top:15px; font-size:14px; color:#666;">
@@ -311,14 +357,14 @@
             </div>
             <input type="hidden" id="hf_Q1" name="hf_Q1" value="">
         </div>
-
+        <!-- Q2 -->
         <div class="question-card" id="q2_card">
             <div class="q-header">
-                <div class="q-title">2. 請在 5 個固定層級中選擇一個最符合的描述</div>
-                <div class="q-desc"></div>
+                <div class="q-title">2.技能傾向評估</div>
+                <div class="q-desc"> 請在 5 個固定層級中選擇一個最符合的描述</div>
             </div>
             <div class="comparison-row">
-                <div class="side-label">勤奮完成任務<br><small>(項目 A)</small></div>
+                <div class="side-label">技術深度<br><small>(項目 A)</small></div>
                 <div class="slider-wrapper">
                     <input type="range" id="range_Q2" class="std-slider" min="-2" max="2" step="1" value="0">
                     <div class="fixed-ticks">
@@ -328,52 +374,72 @@
                         <span id="text_Q2" class="value-badge">同等重要</span>
                     </div>
                 </div>
-                <div class="side-label text-right">重視團隊意見<br><small>(項目 B)</small></div>
+                <div class="side-label text-right">溝通廣度<br><small>(項目 B)</small></div>
             </div>
             <input type="hidden" id="hf_Q2" name="hf_Q2" value="0">
         </div>
-
+        <!-- Q3 -->
         <div class="question-card" id="q3_card">
             <div class="q-header">
-                <div class="q-title">3. 技能傾向評估</div>
-                <div class="q-desc">請拖動滑桿至任意位置，表示您的傾向程度</div>
+                <div class="q-title">3.技能傾向評估</div>
+                <div class="q-desc">請依照您對下列兩個題項的整體感受與偏好，拖動滑桿至最接近您實際傾向的位置。</div>
             </div>
             <div class="comparison-row">
                 <div class="side-label">技術深度<br><small>(項目 A)</small></div>
                 <div class="slider-wrapper">
                     <input type="range" id="range_Q3" class="std-slider" min="-100" max="100" step="0.1" value="0">
                     <div style="display:flex; justify-content:space-between; font-size:12px; color:#999; margin-top: 5px;">
-                        <span>◀ 偏向 A</span><span>偏向 B ▶</span>
+                        <span>◀ 較喜歡 A</span><span>較喜歡 B ▶</span>
                     </div>
+
                     <div style="text-align:center; margin-top:10px;">
-                        <span id="text_Q3" class="value-badge">0 (置中)</span>
+                        <span id="text_Q3" class="value-badge">喜歡A(50%)、喜歡B(50%)</span>
                     </div>
                 </div>
                 <div class="side-label text-right">溝通廣度<br><small>(項目 B)</small></div>
             </div>
             <input type="hidden" id="hf_Q3" name="hf_Q3" value="0">
         </div>
-
+        <!-- Q4 (Drag & Drop) -->
         <div class="question-card" id="q4_card">
             <div class="q-header">
-                <div class="q-title">4. 專案比重分配</div>
-                <div class="q-desc">請在一條量尺上同時標示兩個項目的權重 (0-100)</div>
+                <div class="q-title">4.技能傾向評估</div>
+                <div class="q-desc">請依照您對下列兩個物件的偏好程度，將物件拖曳至下方量尺中，並調整至最接近您實際感受的位置。</div>
             </div>
-            <div class="dual-track-container">
-                <div class="vis-track"></div>
-                <input type="range" id="range_Q4_A" class="overlay-range" min="0" max="100" value="30">
-                <input type="range" id="range_Q4_B" class="overlay-range" min="0" max="100" value="70">
+
+            <!-- 量尺區 -->
+            <div class="q4-track-container" id="q4_track_box">
+                <div class="q4-vis-track"></div>
+                <!-- 標籤 -->
+                <div class="q4-track-labels">
+                    <span>較不喜歡</span>
+                    <span style="position: absolute; left: 50%; transform: translateX(-50%);">普通</span>
+                    <span>較喜歡</span>
+                </div>
+                <!-- 拖曳進來的物件會被放到這裡 -->
             </div>
-            <div style="display:flex; justify-content:space-between; margin-top:20px;">
+
+            <!-- 待選區 -->
+            <div class="q4-item-pool" id="q4_pool_box">
+                <div class="q4-wrapper-item" id="wrap_A">
+                    <div id="drag_item_A" class="q4-drag-item item-a" data-id="A" title="拖曳我">技術<br>深度</div>
+                </div>
+                <div class="q4-wrapper-item" id="wrap_B">
+                    <div id="drag_item_B" class="q4-drag-item item-b" data-id="B" title="拖曳我">溝通<br>廣度</div>
+                </div>
+            </div>
+
+            <!-- 放置結果文字 -->
+            <div style="margin-top:20px; display:none; justify-content:space-between;">
                 <div style="color:var(--primary);">
-                    <strong>● 項目 A (藍)</strong>: <span id="text_Q4_A" class="value-badge val-text-primary">30</span>
+                    <strong>● 項目 A (藍)</strong>: <span id="text_Q4_A" class="value-badge val-text-primary">未放置</span>
                 </div>
                 <div style="color:var(--secondary);">
-                    <strong>● 項目 B (綠)</strong>: <span id="text_Q4_B" class="value-badge val-text-secondary">70</span>
+                    <strong>● 項目 B (綠)</strong>: <span id="text_Q4_B" class="value-badge val-text-secondary">未放置</span>
                 </div>
             </div>
-            <input type="hidden" id="hf_Q4_A" name="hf_Q4_A" value="30">
-            <input type="hidden" id="hf_Q4_B" name="hf_Q4_B" value="70">
+            <input type="hidden" id="hf_Q4_A" name="hf_Q4_A" value="">
+            <input type="hidden" id="hf_Q4_B" name="hf_Q4_B" value="">
         </div>
 
     </div>
@@ -381,7 +447,12 @@
     <script>
         // (JavaScript 部分與上一版相同，無須變動)
         const discrete_map = { "-2": "非常像 A", "-1": "有點像 A", "0": "同等重要", "1": "有點像 B", "2": "非常像 B" };
-
+        function setQ1(option) {
+            $('.select-box').removeClass('active');
+            $('#btn_Q1_' + option).addClass('active');
+            $('#text_Q1').text("項目 " + option);
+            $('#hf_Q1').val(option);
+        }
         $(document).ready(function () {
             // Q2
             $('#range_Q2').on('input change', function () {
@@ -393,29 +464,120 @@
             // Q3
             $('#range_Q3').on('input change', function () {
                 let val = parseFloat($(this).val());
-                let display = val === 0 ? "0 (置中)" : (val < 0 ? "偏向 A (" + Math.abs(val).toFixed(1) + ")" : "偏向 B (" + val.toFixed(1) + ")");
-                $('#text_Q3').text(display);
+                const formatPct = (percentage) => {
+                    const normalized = parseFloat(percentage.toFixed(1));
+                    return Number.isInteger(normalized) ? normalized.toFixed(0) : normalized.toFixed(1);
+                };
+                let aPercent = 50 - val / 2;
+                let bPercent = 100 - aPercent;
+                $('#text_Q3').text(
+                    `喜歡A(${formatPct(aPercent)}%)、喜歡B(${formatPct(bPercent)}%)`
+                );
                 $('#hf_Q3').val(val);
             });
 
-            // Q4
-            function updateQ4(sourceId, targetTextId, targetHfId) {
-                let val = $(sourceId).val();
-                $(targetTextId).text(val);
-                $(targetHfId).val(val);
-                $('.overlay-range').css('z-index', 2);
-                $(sourceId).css('z-index', 10);
-            }
-            $('#range_Q4_A').on('input', function () { updateQ4('#range_Q4_A', '#text_Q4_A', '#hf_Q4_A'); });
-            $('#range_Q4_B').on('input', function () { updateQ4('#range_Q4_B', '#text_Q4_B', '#hf_Q4_B'); });
+            // ==========================================
+            // Q4 - Drag & Drop Logic
+            // ==========================================
+            const $trackContainer = $('#q4_track_box');
+            const $trackLine = $trackContainer.find('.q4-vis-track');
+            const $pool = $('#q4_pool_box');
+
+            // 初始化 Draggable
+            $('.q4-drag-item').draggable({
+                revert: 'invalid', // 如果沒放到 Droppable 區域，自動彈回
+                containment: 'body',
+                cursor: 'grabbing',
+                zIndex: 1000
+            });
+
+            // 設定 Track 區域為 Droppable
+            $trackContainer.droppable({
+                accept: '.q4-drag-item',
+                tolerance: 'touch',
+                drop: function (event, ui) {
+                    const $item = ui.draggable;
+                    const itemId = $item.data('id');
+
+                    // 1. 若從 Pool 拖來，將 DOM 移至 Track Container 內 (使其 absolute 定位基準改變)
+                    if ($item.parent()[0] !== $trackContainer[0]) {
+                        $item.detach().appendTo($trackContainer);
+                        $item.css({ position: 'absolute' });
+                    }
+
+                    // 2. 計算數值
+                    // 軌道有效範圍：為了美觀，左右各留 35px 邊距 (對應 CSS .q4-vis-track 的 left/right)
+                    const trackLeft = $trackLine.offset().left;
+                    const trackWidth = $trackLine.width();
+
+                    // 取得物件中心點
+                    let itemCenterX = ui.offset.left + $item.outerWidth() / 2;
+
+                    // 限制範圍 (Clamp)
+                    if (itemCenterX < trackLeft) itemCenterX = trackLeft;
+                    if (itemCenterX > trackLeft + trackWidth) itemCenterX = trackLeft + trackWidth;
+
+                    // 計算 0-100
+                    let percent = ((itemCenterX - trackLeft) / trackWidth) * 100;
+                    percent = Math.max(0, Math.min(100, percent)); // 確保 0-100
+
+                    // 3. 設定位置 (垂直置中，水平依百分比)
+                    // 注意：這裡使用 CSS % 定位，以適應 RWD
+                    $item.css({
+                        top: '40%',
+                        left: (35 + (trackWidth * (percent / 100))) + 'px', // 35是起始偏移
+                        marginTop: '-30px', // 高度一半
+                        marginLeft: '-30px' // 寬度一半
+                    });
+
+                    // 這裡改用百分比設定 left，以便視窗縮放時保持相對位置 (較複雜，先用 px 確保拖曳當下準確，
+                    // 若要 RWD 更好，可在 drop 後將 left 轉為 calc 或 %)
+                    // 簡易 RWD 修正：
+                    const containerWidth = $trackContainer.width();
+                    // 35px 佔容器的比例
+                    const paddingPct = (35 / containerWidth) * 100;
+                    // track 佔容器的比例
+                    const trackPct = (trackWidth / containerWidth) * 100;
+                    const finalLeftPct = ((35 + (trackWidth * (percent / 100))) / containerWidth) * 100;
+
+                    $item.css('left', finalLeftPct + '%');
+
+                    // 4. 更新數值
+                    const finalVal = Math.round(percent);
+                    $('#text_Q4_' + itemId).text(finalVal);
+                    $('#hf_Q4_' + itemId).val(finalVal);
+                }
+            });
+
+            // 設定 Pool 區域為 Droppable (允許拖回去重置)
+            $pool.droppable({
+                accept: '.q4-drag-item',
+                drop: function (event, ui) {
+                    const $item = ui.draggable;
+                    const itemId = $item.data('id');
+
+                    // 放回原本的 Wrapper
+                    const $wrapper = $('#wrap_' + itemId);
+                    $item.detach().appendTo($wrapper);
+
+                    // 重置樣式
+                    $item.css({
+                        position: 'static',
+                        top: 'auto',
+                        left: 'auto',
+                        marginTop: '0',
+                        marginLeft: '0'
+                    });
+
+                    // 重置數值
+                    $('#text_Q4_' + itemId).text("未放置");
+                    $('#hf_Q4_' + itemId).val("-1");
+                }
+            });
+
         });
 
-        function setQ1(option) {
-            $('.select-box').removeClass('active');
-            $('#btn_Q1_' + option).addClass('active');
-            $('#text_Q1').text("方案 " + option);
-            $('#hf_Q1').val(option);
-        }
+
     </script>
 
 </body>
