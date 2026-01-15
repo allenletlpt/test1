@@ -186,13 +186,13 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
             margin-top: -8px;
         }
-
+        /* 第2題專用：刻度 */
         .fixed-ticks {
             display: flex;
             justify-content: space-between;
             font-size: 12px;
-            color: #aaa;
-            margin-top: 5px;
+            color: #666; /* 加深文字顏色 */
+            margin-top: 8px; /* 增加間距 */
             padding: 0 5px;
         }
 
@@ -202,14 +202,31 @@
             width: 10px;
         }
 
+            /* 刻度線加粗加長 */
             .tick::before {
                 content: '';
                 position: absolute;
-                top: -18px;
+                top: -20px; /* 位置微調 */
                 left: 50%;
-                width: 2px;
+                transform: translateX(-50%);
+                width: 3px; /* 加粗 */
+                height: 10px; /* 加長 */
+                background: #999; /* 加深顏色 */
+                border-radius: 2px;
+            }
+
+            /* 增加一個小圓點讓刻度更明顯 (選用) */
+            .tick::after {
+                content: '';
+                position: absolute;
+                top: -24px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 6px;
                 height: 6px;
-                background: #ccc;
+                background: #666;
+                border-radius: 50%;
+                z-index: 1;
             }
 
         .value-badge {
@@ -446,7 +463,7 @@
 
     <script>
         // (JavaScript 部分與上一版相同，無須變動)
-        const discrete_map = { "-2": "非常像 A", "-1": "有點像 A", "0": "同等重要", "1": "有點像 B", "2": "非常像 B" };
+        const discrete_map = { "-2": "非常像 A", "-1": "有點像 A", "0": "同等", "1": "有點像 B", "2": "非常像 B" };
         function setQ1(option) {
             $('.select-box').removeClass('active');
             $('#btn_Q1_' + option).addClass('active');
