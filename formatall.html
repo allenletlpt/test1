@@ -130,9 +130,13 @@
         }
 
         .side-label {
-            width: 20%;
+            width: 10%;
             font-weight: bold;
             font-size: 16px;
+
+            border: 3px solid #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            margin-top: -8px;
         }
 
             .side-label.text-right {
@@ -140,7 +144,7 @@
             }
 
         .slider-wrapper {
-            width: 55%;
+            width: 75%;
             padding: 0 10px;
             position: relative;
         }
@@ -251,7 +255,7 @@
         /* --- 第4題樣式 (Drag & Drop) --- */
         .q4-track-container {
             position: relative;
-            height: 120px;
+            height: 150px; /* 增加高度，讓球體可以懸浮在量尺上方而不被切掉 */
             background: #fafbfc;
             border: 2px solid #e9ecef;
             border-radius: 8px;
@@ -261,7 +265,7 @@
 
         .q4-vis-track {
             position: absolute;
-            top: 40%;
+            top: 85px; /* 將量尺位置固定在較下方，讓上方有空間放球 */
             left: 35px; /* 留出圓球半徑空間 */
             right: 35px;
             height: 12px;
@@ -275,14 +279,35 @@
 
         .q4-track-labels {
             position: absolute;
-            bottom: 15px;
+            bottom: 15px; /* 調整標籤位置 */
             left: 35px;
             right: 35px;
+            /* 移除 display: flex 改用絕對定位佈局 */
+            height: 30px;
+            font-size: 13px;
+            font-weight: bold;
+            color: #444;
+            pointer-events: none;
+        }
+
+        /* Q4 專用佈局樣式 (仿照 Q3) */
+        .q4-label-edge {
+            position: absolute;
+            top: 0;
+            white-space: nowrap;
+        }
+        .q4-edge-left { left: 0; }
+        .q4-edge-right { right: 0; }
+
+        .q4-mid-group {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%; 
             display: flex;
             justify-content: space-between;
-            font-size: 14px;
-            color: #888;
-            pointer-events: none;
+            align-items: center;
         }
 
         .q4-item-pool {
@@ -299,7 +324,7 @@
 
         .q4-wrapper-item {
             width: 70px;
-            height: 70px;
+            height: 80px; /* 稍微加高以容納箭頭 */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -309,6 +334,7 @@
         }
 
         .q4-drag-item {
+            position: relative; /* [修正] 加入此行，確保箭頭定位參考點永遠是圓球本身 */
             width: 60px;
             height: 60px;
             border-radius: 50%;
@@ -325,6 +351,35 @@
             text-align: center;
             line-height: 1.2;
             touch-action: none; /* 防止觸控時捲動頁面 */
+        }
+
+        /* 新增：拖曳物件下方的箭頭 */
+        .q4-drag-item::after {
+            content: '';
+            position: absolute;
+            bottom: -12px; /* 箭頭尖端位置 */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 12px solid #ccc; /* 預設顏色 */
+            pointer-events: none; /* 避免箭頭影響點擊 */
+        }
+
+        /* [新增] 當物件在待選區 (Wrapper) 內時，隱藏箭頭，避免視覺混亂 */
+        .q4-wrapper-item .q4-drag-item::after {
+            display: none;
+        }
+
+        /* 配合物件顏色的箭頭 */
+        .q4-drag-item.item-a::after {
+            border-top-color: var(--primary);
+        }
+        
+        .q4-drag-item.item-b::after {
+            border-top-color: var(--secondary);
         }
 
             .q4-drag-item:active {
@@ -347,6 +402,97 @@
             transform: scale(1.1);
             z-index: 1000;
         }
+
+        /* --- 第3題 虛線箭頭樣式 --- */
+        /* 新增 Q3 專用的標籤佈局樣式 */
+        .q3-labels-row {
+            position: relative;
+            margin-top: 10px;
+            height: 30px; /* 預留高度給重疊的標籤 */
+            font-size: 13px;
+            font-weight: bold;
+            color: #444;
+        }
+        
+        /* 兩端的最喜歡 */
+        .q3-label-edge {
+            position: absolute;
+            top: 0;
+            white-space: nowrap;
+        }
+        .q3-edge-left { left: 0; }
+        .q3-edge-right { right: 0; }
+
+        /* 中間的較喜歡區塊 - 佔據中間 50% 的寬度，達到 1/4 和 3/4 的定位效果 */
+        .q3-mid-group {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%; /* 調整此寬度可控制較喜歡A/B的距離，60%大約落在左右各20%-80%處，接近視覺上的1/2位置 */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .arrow-text {
+            color: #666;
+            white-space: nowrap;
+        }
+
+        .dashed-arrow-line {
+            flex: 1;
+            margin: 0 8px; /* 文字與箭頭的距離 */
+            height: 0;
+            border-top: 2px dashed #aaa; /* 虛線 */
+            position: relative;
+        }
+
+            /* 左箭頭 (實心三角形) */
+            .dashed-arrow-line::before {
+                content: '';
+                position: absolute;
+                left: -1px;
+                top: -5px; /* 垂直置中修正 */
+                width: 0;
+                height: 0;
+                border-top: 5px solid transparent;
+                border-bottom: 5px solid transparent;
+                border-right: 8px solid #aaa; /* 箭頭向左 */
+            }
+
+            /* 右箭頭 (實心三角形) */
+            .dashed-arrow-line::after {
+                content: '';
+                position: absolute;
+                right: -1px;
+                top: -5px; /* 垂直置中修正 */
+                width: 0;
+                height: 0;
+                border-top: 5px solid transparent;
+                border-bottom: 5px solid transparent;
+                border-left: 8px solid #aaa; /* 箭頭向右 */
+            }
+
+        /* 中心文字樣式 - 加在虛線中間 */
+        .center-text {
+            position: absolute;
+            top: -8px; /* 垂直置中調整 (字體高度的一半附近) */
+            left: 50%;
+            transform: translateX(-50%);
+            background: #fff; /* 背景色遮擋虛線 */
+            padding: 0 5px;
+            color: #888;
+            font-size: 12px;
+            line-height: 14px;
+            white-space: nowrap;
+        }
+
+        /* Q4 專用：修正中心文字背景色以配合軌道容器底色 */
+        .q4-track-container .center-text {
+            background: #fafbfc;
+        }
+
     </style>
 </head>
 <body>
@@ -388,7 +534,7 @@
                         <div class="tick"></div><div class="tick"></div><div class="tick"></div><div class="tick"></div><div class="tick"></div>
                     </div>
                     <div style="text-align:center; margin-top:15px;">
-                        <span id="text_Q2" class="value-badge">同等</span>
+                        <span id="text_Q2" class="value-badge">A與B同等</span>
                     </div>
                 </div>
                 <div class="side-label text-right">溝通廣度<br><small>(項目 B)</small></div>
@@ -405,11 +551,26 @@
                 <div class="side-label">技術深度<br><small>(項目 A)</small></div>
                 <div class="slider-wrapper">
                     <input type="range" id="range_Q3" class="std-slider" min="-100" max="100" step="0.1" value="0">
-                    <div style="display:flex; justify-content:space-between; font-size:12px; color:#999; margin-top: 5px;">
-                        <span>◀ 較喜歡 A</span><span>較喜歡 B ▶</span>
+                    
+                    <!-- 修改後的 Q3 標籤結構 -->
+                    <div class="q3-labels-row">
+                        <!-- 最左 -->
+                        <div class="q3-label-edge q3-edge-left">最喜歡A</div>
+                        
+                        <!-- 中間區塊 (包含較喜歡A, 箭頭, 較喜歡B) -->
+                        <div class="q3-mid-group">
+                            <span class="arrow-text">較喜歡 A</span>
+                            <div class="dashed-arrow-line">
+                                <span class="center-text">A與B同等</span>
+                            </div>
+                            <span class="arrow-text">較喜歡 B</span>
+                        </div>
+                        
+                        <!-- 最右 -->
+                        <div class="q3-label-edge q3-edge-right">最喜歡B</div>
                     </div>
 
-                    <div style="text-align:center; margin-top:10px;">
+                    <div style="text-align:center; margin-top:15px;">
                         <span id="text_Q3" class="value-badge">喜歡A(50%)、喜歡B(50%)</span>
                     </div>
                 </div>
@@ -429,9 +590,20 @@
                 <div class="q4-vis-track"></div>
                 <!-- 標籤 -->
                 <div class="q4-track-labels">
-                    <span>較不喜歡</span>
-                    <span style="position: absolute; left: 50%; transform: translateX(-50%);">普通</span>
-                    <span>較喜歡</span>
+                    <!-- 最左 -->
+                    <div class="q4-label-edge q4-edge-left">最不喜歡</div>
+                    
+                    <!-- 中間區塊 -->
+                    <div class="q4-mid-group">
+                        <span class="arrow-text">較不喜歡</span>
+                        <div class="dashed-arrow-line">
+                            <span class="center-text">A與B同等</span>
+                        </div>
+                        <span class="arrow-text">較喜歡</span>
+                    </div>
+                    
+                    <!-- 最右 -->
+                    <div class="q4-label-edge q4-edge-right">最喜歡</div>
                 </div>
                 <!-- 拖曳進來的物件會被放到這裡 -->
             </div>
@@ -467,7 +639,7 @@
 
     <script>
         // (JavaScript 部分與上一版相同，無須變動)
-        const discrete_map = { "-2": "非常像 A", "-1": "有點像 A", "0": "同等", "1": "有點像 B", "2": "非常像 B" };
+        const discrete_map = { "-2": "非常像 A", "-1": "有點像 A", "0": "A與B同等", "1": "有點像 B", "2": "非常像 B" };
         function setQ1(option) {
             $('.select-box').removeClass('active');
             $('#btn_Q1_' + option).addClass('active');
@@ -503,6 +675,12 @@
             // Q4 - Drag & Drop Logic
             // ==========================================
             const $trackContainer = $('#q4_track_box');
+            /* 定義量尺的垂直位置參數 (像素) */
+            const TRACK_Y_POS = 85; 
+            const ITEM_H_TOTAL = 72; // 圓球60 + 箭頭12
+            /* 計算物件放置的 Top 值: 量尺位置 - 物件總高 = 箭頭尖端剛好碰到量尺 */
+            const ITEM_DROP_TOP = TRACK_Y_POS - ITEM_H_TOTAL; 
+
             const $trackLine = $trackContainer.find('.q4-vis-track');
             const $pool = $('#q4_pool_box');
 
@@ -511,6 +689,9 @@
                 revert: 'invalid', // 如果沒放到 Droppable 區域，自動彈回
                 containment: 'body',
                 cursor: 'grabbing',
+                // 設定游標位置在箭頭尖端 (圓球高60 + 箭頭10~12 => 游標設在 Y=72 左右)
+                // 這樣拖曳時，圓球會顯示在滑鼠上方，不會擋住視野
+                cursorAt: { top: 72, left: 30 }, 
                 zIndex: 1000
             });
 
@@ -522,52 +703,53 @@
                     const $item = ui.draggable;
                     const itemId = $item.data('id');
 
-                    // 1. 若從 Pool 拖來，將 DOM 移至 Track Container 內 (使其 absolute 定位基準改變)
+                    // 1. 若從 Pool 拖來，將 DOM 移至 Track Container 內
                     if ($item.parent()[0] !== $trackContainer[0]) {
                         $item.detach().appendTo($trackContainer);
                         $item.css({ position: 'absolute' });
                     }
 
-                    // 2. 計算數值
-                    // 軌道有效範圍：為了美觀，左右各留 35px 邊距 (對應 CSS .q4-vis-track 的 left/right)
+                    // 2. [修正] 使用 event.pageX (滑鼠絕對座標) 作為中心點基準
+                    // 這樣可以確保「放開滑鼠時，物件中心點就在滑鼠位置」
+                    let mouseX = event.pageX;
+
+                    // 取得量尺的邊界資訊
                     const trackLeft = $trackLine.offset().left;
                     const trackWidth = $trackLine.width();
+                    const trackRight = trackLeft + trackWidth;
 
-                    // 取得物件中心點
-                    let itemCenterX = ui.offset.left + $item.outerWidth() / 2;
+                    // 限制範圍 (Clamp)：確保滑鼠就算超出量尺左右，球體中心也只會停在量尺邊緣
+                    let clampedCenterX = mouseX;
+                    if (clampedCenterX < trackLeft) clampedCenterX = trackLeft;
+                    if (clampedCenterX > trackRight) clampedCenterX = trackRight;
 
-                    // 限制範圍 (Clamp)
-                    if (itemCenterX < trackLeft) itemCenterX = trackLeft;
-                    if (itemCenterX > trackLeft + trackWidth) itemCenterX = trackLeft + trackWidth;
+                    // 3. 計算數值 (0-100)
+                    let percent = ((clampedCenterX - trackLeft) / trackWidth) * 100;
+                    percent = Math.max(0, Math.min(100, percent));
 
-                    // 計算 0-100
-                    let percent = ((itemCenterX - trackLeft) / trackWidth) * 100;
-                    percent = Math.max(0, Math.min(100, percent)); // 確保 0-100
+                    // 4. 計算 CSS left 的百分比位置 (RWD)
+                    // 計算物件中心點在容器內的相對位置
+                    const containerLeft = $trackContainer.offset().left;
+                    const containerWidth = $trackContainer.width();
+                    
+                    // 物件中心點相對於容器左側的距離
+                    const relativeX = clampedCenterX - containerLeft;
+                    
+                    // 換算成容器寬度的百分比
+                    const finalLeftPct = (relativeX / containerWidth) * 100;
 
-                    // 3. 設定位置 (垂直置中，水平依百分比)
-                    // 注意：這裡使用 CSS % 定位，以適應 RWD
+                    // 5. 設定位置
+                    // left: 設定為中心點位置
+                    // marginLeft: -30px (寬度60的一半)，將物件往左拉回，達成置中效果
                     $item.css({
-                        top: '40%',
-                        left: (35 + (trackWidth * (percent / 100))) + 'px', // 35是起始偏移
-                        marginTop: '-30px', // 高度一半
-                        marginLeft: '-30px' // 寬度一半
+                        top: ITEM_DROP_TOP + 'px',
+                        left: finalLeftPct + '%',
+                        marginTop: '0', 
+                        marginLeft: '-30px' 
                     });
 
-                    // 這裡改用百分比設定 left，以便視窗縮放時保持相對位置 (較複雜，先用 px 確保拖曳當下準確，
-                    // 若要 RWD 更好，可在 drop 後將 left 轉為 calc 或 %)
-                    // 簡易 RWD 修正：
-                    const containerWidth = $trackContainer.width();
-                    // 35px 佔容器的比例
-                    const paddingPct = (35 / containerWidth) * 100;
-                    // track 佔容器的比例
-                    const trackPct = (trackWidth / containerWidth) * 100;
-                    const finalLeftPct = ((35 + (trackWidth * (percent / 100))) / containerWidth) * 100;
-
-                    $item.css('left', finalLeftPct + '%');
-
-                    // 4. 更新數值
+                    // 6. 更新顯示數值
                     const finalVal = Math.round(percent*10);
-                    //$('#text_Q4_' + itemId).text(finalVal);
                     const displayVal = parseFloat((finalVal / 10).toFixed(1));
                     $('#text_Q4_' + itemId).text(displayVal + " %");
                     $('#hf_Q4_' + itemId).val(finalVal);
