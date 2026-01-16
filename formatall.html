@@ -689,10 +689,19 @@
                 revert: 'invalid', // 如果沒放到 Droppable 區域，自動彈回
                 containment: 'body',
                 cursor: 'grabbing',
-                // 設定游標位置在箭頭尖端 (圓球高60 + 箭頭10~12 => 游標設在 Y=72 左右)
-                // 這樣拖曳時，圓球會顯示在滑鼠上方，不會擋住視野
                 cursorAt: { top: 72, left: 30 }, 
-                zIndex: 1000
+                zIndex: 1000,
+                helper: 'clone',        // [新增] 使用複製項目進行拖曳，避免受限於原容器
+                appendTo: 'body',       // [新增] 將複製項目附加到 body，確保置頂顯示
+                
+                // [新增] 開始拖曳時，將「本體」隱藏 (只看得到跟隨滑鼠的 clone)
+                start: function(event, ui) {
+                    $(this).css('opacity', 0); 
+                },
+                // [新增] 停止拖曳時(無論成功或失敗)，恢復本體顯示
+                stop: function(event, ui) {
+                    $(this).css('opacity', 1);
+                }
             });
 
             // 設定 Track 區域為 Droppable
@@ -700,47 +709,60 @@
                 accept: '.q4-drag-item',
                 tolerance: 'touch',
                 drop: function (event, ui) {
+                    // ui.draggable 指向「原本的物件」(即使使用 clone)
                     const $item = ui.draggable;
                     const itemId = $item.data('id');
-
-                    // 1. 若從 Pool 拖來，將 DOM 移至 Track Container 內
-                    if ($item.parent()[0] !== $trackContainer[0]) {
-                        $item.detach().appendTo($trackContainer);
-                        $item.css({ position: 'absolute' });
-                    }
-
-                    // 2. [修正] 使用 event.pageX (滑鼠絕對座標) 作為中心點基準
-                    // 這樣可以確保「放開滑鼠時，物件中心點就在滑鼠位置」
+                    
+                    // 1. 計算預期落點數值 (不實際移動 DOM)
                     let mouseX = event.pageX;
 
-                    // 取得量尺的邊界資訊
                     const trackLeft = $trackLine.offset().left;
                     const trackWidth = $trackLine.width();
                     const trackRight = trackLeft + trackWidth;
 
-                    // 限制範圍 (Clamp)：確保滑鼠就算超出量尺左右，球體中心也只會停在量尺邊緣
                     let clampedCenterX = mouseX;
                     if (clampedCenterX < trackLeft) clampedCenterX = trackLeft;
                     if (clampedCenterX > trackRight) clampedCenterX = trackRight;
 
-                    // 3. 計算數值 (0-100)
                     let percent = ((clampedCenterX - trackLeft) / trackWidth) * 100;
                     percent = Math.max(0, Math.min(100, percent));
+                    
+                    const finalVal = Math.round(percent*10); 
 
-                    // 4. 計算 CSS left 的百分比位置 (RWD)
-                    // 計算物件中心點在容器內的相對位置
+                    // 重疊檢查
+                    let isOverlap = false;
+                    $trackContainer.find('.q4-drag-item').each(function() {
+                        const $otherItem = $(this);
+                        if ($otherItem.data('id') !== itemId) {
+                            const otherVal = parseInt($('#hf_Q4_' + $otherItem.data('id')).val());
+                            if (!isNaN(otherVal) && otherVal !== -1 && otherVal === finalVal) {
+                                isOverlap = true;
+                                return false; 
+                            }
+                        }
+                    });
+
+                    if (isOverlap) {
+                        // 若重疊，不進行移動。
+                        // 程式會自動觸發 stop 事件，屆時 opacity 會恢復為 1，
+                        // 視覺效果就像物件彈回起始位置。
+                        return; 
+                    }
+
+                    // --- 移動邏輯 ---
+
+                    // 1. 將 DOM 移至 Track Container 內
+                    // 因為使用 clone，本體可能還在 pool 或 track 其他位置，這裡強制移動到新容器
+                    $item.detach().appendTo($trackContainer);
+                    $item.css({ position: 'absolute', opacity: 1 }); // 確保可見
+
+                    // 2. 計算 RWD 位置
                     const containerLeft = $trackContainer.offset().left;
                     const containerWidth = $trackContainer.width();
-                    
-                    // 物件中心點相對於容器左側的距離
                     const relativeX = clampedCenterX - containerLeft;
-                    
-                    // 換算成容器寬度的百分比
                     const finalLeftPct = (relativeX / containerWidth) * 100;
 
-                    // 5. 設定位置
-                    // left: 設定為中心點位置
-                    // marginLeft: -30px (寬度60的一半)，將物件往左拉回，達成置中效果
+                    // 3. 設定位置
                     $item.css({
                         top: ITEM_DROP_TOP + 'px',
                         left: finalLeftPct + '%',
@@ -748,8 +770,7 @@
                         marginLeft: '-30px' 
                     });
 
-                    // 6. 更新顯示數值
-                    const finalVal = Math.round(percent*10);
+                    // 4. 更新數值
                     const displayVal = parseFloat((finalVal / 10).toFixed(1));
                     $('#text_Q4_' + itemId).text(displayVal + " %");
                     $('#hf_Q4_' + itemId).val(finalVal);
