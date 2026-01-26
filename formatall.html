@@ -381,20 +381,17 @@
         .q4-drag-item.item-b::after {
             border-top-color: var(--secondary);
         }
+        .q4-drag-item.item-c::after { border-top-color: #6f42c1; }
+        .q4-drag-item.item-d::after { border-top-color: #fd7e14; }
+        .q4-drag-item.item-e::after { border-top-color: #20c997; }
+        .q4-drag-item.item-f::after { border-top-color: #e83e8c; }
 
-            .q4-drag-item:active {
-                cursor: grabbing;
-            }
-
-        .item-a {
-            background: var(--primary);
-            border: 2px solid #fff;
-        }
-
-        .item-b {
-            background: var(--secondary);
-            border: 2px solid #fff;
-        }
+        .item-a { background: var(--primary); border: 2px solid #fff; }
+        .item-b { background: var(--secondary); border: 2px solid #fff; }
+        .item-c { background: #6f42c1; border: 2px solid #fff; }
+        .item-d { background: #fd7e14; border: 2px solid #fff; }
+        .item-e { background: #20c997; border: 2px solid #fff; }
+        .item-f { background: #e83e8c; border: 2px solid #fff; }
 
         /* 拖曳時的狀態 */
         .q4-drag-item.ui-draggable-dragging {
@@ -616,23 +613,50 @@
                 <div class="q4-wrapper-item" id="wrap_B">
                     <div id="drag_item_B" class="q4-drag-item item-b" data-id="B" title="拖曳我">溝通<br>廣度</div>
                 </div>
+                <div class="q4-wrapper-item" id="wrap_C">
+                    <div id="drag_item_C" class="q4-drag-item item-c" data-id="C" title="拖曳我">項目<br>C</div>
+                </div>
+                <div class="q4-wrapper-item" id="wrap_D">
+                    <div id="drag_item_D" class="q4-drag-item item-d" data-id="D" title="拖曳我">項目<br>D</div>
+                </div>
+                <div class="q4-wrapper-item" id="wrap_E">
+                    <div id="drag_item_E" class="q4-drag-item item-e" data-id="E" title="拖曳我">項目<br>E</div>
+                </div>
+                <div class="q4-wrapper-item" id="wrap_F">
+                    <div id="drag_item_F" class="q4-drag-item item-f" data-id="F" title="拖曳我">項目<br>F</div>
+                </div>
             </div>
 
             <!-- 放置結果文字 -->
             <br/><br />
             <hr/>
             <p>作答時可再考慮隱藏以下數值</p>
-            <div style="margin-top:20px; display:flex; justify-content:space-between; border:1px solid black">
-                
+            <div style="margin-top:20px; display:flex; flex-wrap:wrap; gap:10px; justify-content:space-between; border:1px solid black">
                 <div style="color:var(--primary);">
-                    <strong>● 項目 A (藍)</strong>: <span id="text_Q4_A" class="value-badge val-text-primary">未放置</span>
+                    <strong>● 項目 A</strong>: <span id="text_Q4_A" class="value-badge val-text-primary">未放置</span>
                 </div>
                 <div style="color:var(--secondary);">
-                    <strong>● 項目 B (綠)</strong>: <span id="text_Q4_B" class="value-badge val-text-secondary">未放置</span>
+                    <strong>● 項目 B</strong>: <span id="text_Q4_B" class="value-badge val-text-secondary">未放置</span>
+                </div>
+                <div style="color:#6f42c1;">
+                    <strong>● 項目 C</strong>: <span id="text_Q4_C" class="value-badge">未放置</span>
+                </div>
+                <div style="color:#fd7e14;">
+                    <strong>● 項目 D</strong>: <span id="text_Q4_D" class="value-badge">未放置</span>
+                </div>
+                <div style="color:#20c997;">
+                    <strong>● 項目 E</strong>: <span id="text_Q4_E" class="value-badge">未放置</span>
+                </div>
+                <div style="color:#e83e8c;">
+                    <strong>● 項目 F</strong>: <span id="text_Q4_F" class="value-badge">未放置</span>
                 </div>
             </div>
             <input type="hidden" id="hf_Q4_A" name="hf_Q4_A" value="">
             <input type="hidden" id="hf_Q4_B" name="hf_Q4_B" value="">
+            <input type="hidden" id="hf_Q4_C" name="hf_Q4_C" value="">
+            <input type="hidden" id="hf_Q4_D" name="hf_Q4_D" value="">
+            <input type="hidden" id="hf_Q4_E" name="hf_Q4_E" value="">
+            <input type="hidden" id="hf_Q4_F" name="hf_Q4_F" value="">
         </div>
 
     </div>
@@ -709,7 +733,6 @@
                 accept: '.q4-drag-item',
                 tolerance: 'touch',
                 drop: function (event, ui) {
-                    // ui.draggable 指向「原本的物件」(即使使用 clone)
                     const $item = ui.draggable;
                     const itemId = $item.data('id');
                     
